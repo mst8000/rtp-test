@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioExchangerCs", "AudioExchangerCs\AudioExchangerCs.csproj", "{5EE22478-CAF7-4E22-9C34-C98496AA186F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleProjects", "ExampleProjects", "{8130EAF3-02E2-480F-8646-0EBEB5F05790}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendAudio", "SendAudio\SendAudio.csproj", "{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReceiveAudio", "ReceiveAudio\ReceiveAudio.csproj", "{CA541BE5-B0DA-4CD5-87BC-592C562DF80F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA541BE5-B0DA-4CD5-87BC-592C562DF80F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA541BE5-B0DA-4CD5-87BC-592C562DF80F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA541BE5-B0DA-4CD5-87BC-592C562DF80F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA541BE5-B0DA-4CD5-87BC-592C562DF80F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9} = {8130EAF3-02E2-480F-8646-0EBEB5F05790}
+		{CA541BE5-B0DA-4CD5-87BC-592C562DF80F} = {8130EAF3-02E2-480F-8646-0EBEB5F05790}
+	EndGlobalSection
+EndGlobal
