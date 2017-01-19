@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
@@ -17,49 +18,71 @@ namespace SendAudio
         // http://wildpie.hatenablog.com/entry/2014/09/24/000900
 
         //データを送信するリモートホストとポート番号
-        const string remoteHost = "127.0.0.1";
+        //const string remoteHost = "192.168.15.101";
+        //const string remoteHost = "127.0.0.1";
         const int remotePort = 50002;
+
+        //最大UDPペイロードサイズ
+        const int bufsize = 330;
 
         static void Main(string[] args)
         {
-            //UdpClientオブジェクトを作成する
+            //接続先のIPアドレスを入力
+            Console.Write("接続先IPアドレス：");
+            string remoteHost = Console.ReadLine();
+
+            //String型のIPアドレスをIPAddress型にParse
+            IPAddress remoteAddress;
+            if (IPAddress.TryParse(remoteHost,out remoteAddress) == false)
+            {
+                Console.WriteLine("正しくないIPアドレスが入力されました");
+
+                // 終了
+                Environment.Exit(-1);
+            }
+
+            //IPエンドポイントを生成
+            var remoteEndPoint = new IPEndPoint(remoteAddress, remotePort);
+
+
+            //UdpClientオブジェクトを生成
             System.Net.Sockets.UdpClient udp = new System.Net.Sockets.UdpClient();
 
             using (var waveIn = new WaveInEvent())
             {
-                waveIn.BufferMilliseconds = 200;
+                waveIn.BufferMilliseconds = 20;
+ 
                 long count = 0;
-                int bufsize = 1400;
 
                 //音声データ利用可能時の処理
                 waveIn.DataAvailable += async (_, e) =>
                 {
-                    //byte[]であるe.Bufferのうち先頭からe.BytesRecorded個が有効な録音データなのでそれを使って何かする
-
-                    //byte[] bufferToSend = new byte[e.BytesRecorded];      //送信するデータ
-                    //Array.Copy(e.Buffer, bufferToSend, e.BytesRecorded);
-
                     //-- 送信処理 --
-
                     byte[] bufferToSend = new byte[bufsize];
 
-                    for (int i = 0; i + bufsize < e.BytesRecorded; i += bufsize)
+                    for (int i = 0; i < e.BytesRecorded; i += bufsize)
                     {
-                        Array.Copy(e.Buffer, i, bufferToSend, e.BytesRecorded, bufsize);
-
-                        await udp.SendAsync(bufferToSend, e.BytesRecorded, remoteHost, remotePort);
+                        if (e.BytesRecorded > i + bufsize)
+                        {
+                            Array.Copy(e.Buffer, i, bufferToSend, 0, bufsize);
+                            await udp.SendAsync(bufferToSend, bufferToSend.Length, remoteEndPoint);
+                        }
+                        else
+                        {
+                            Array.Copy(e.Buffer, i, bufferToSend, 0, e.BytesRecorded - i);
+                            await udp.SendAsync(bufferToSend, e.BytesRecorded - i, remoteEndPoint);
+                        }
                     }
-
-
-
-
+                    
                     count += e.BytesRecorded;
                     Console.WriteLine(count);
+
+                    await Task.Delay(10);
 
                 };
 
                 //入力フォーマット設定
-                waveIn.WaveFormat = new WaveFormat(16000, 8, 1);
+                waveIn.WaveFormat = new WaveFormat(8000, 16, 1);
 
                 //音声の取得開始
                 waveIn.StartRecording();
@@ -70,6 +93,8 @@ namespace SendAudio
                 //音声の取得終了
                 waveIn.StopRecording();
             }
+
+            udp.Close();
 
             Console.WriteLine("Program ended successfully.");
         }
