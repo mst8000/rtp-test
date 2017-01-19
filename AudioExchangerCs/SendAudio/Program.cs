@@ -7,7 +7,6 @@ using System.Net;
 
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
-using System.IO;
 
 namespace SendAudio
 {
@@ -18,8 +17,6 @@ namespace SendAudio
         // http://wildpie.hatenablog.com/entry/2014/09/24/000900
 
         //データを送信するリモートホストとポート番号
-        //const string remoteHost = "192.168.15.101";
-        //const string remoteHost = "127.0.0.1";
         const int remotePort = 50002;
 
         //最大UDPペイロードサイズ
@@ -33,7 +30,7 @@ namespace SendAudio
 
             //String型のIPアドレスをIPAddress型にParse
             IPAddress remoteAddress;
-            if (IPAddress.TryParse(remoteHost,out remoteAddress) == false)
+            if (IPAddress.TryParse(remoteHost, out remoteAddress) == false)
             {
                 Console.WriteLine("正しくないIPアドレスが入力されました");
 
@@ -51,7 +48,7 @@ namespace SendAudio
             using (var waveIn = new WaveInEvent())
             {
                 waveIn.BufferMilliseconds = 20;
- 
+
                 long count = 0;
 
                 //音声データ利用可能時の処理
@@ -64,16 +61,18 @@ namespace SendAudio
                     {
                         if (e.BytesRecorded > i + bufsize)
                         {
+                            //バッファ内のデータがペイロードサイズ以上
                             Array.Copy(e.Buffer, i, bufferToSend, 0, bufsize);
                             await udp.SendAsync(bufferToSend, bufferToSend.Length, remoteEndPoint);
                         }
                         else
                         {
+                            //バッファ内のサイズがペイロードサイズ以下
                             Array.Copy(e.Buffer, i, bufferToSend, 0, e.BytesRecorded - i);
                             await udp.SendAsync(bufferToSend, e.BytesRecorded - i, remoteEndPoint);
                         }
                     }
-                    
+
                     count += e.BytesRecorded;
                     Console.WriteLine(count);
 

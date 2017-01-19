@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Net;
 
 using NAudio.Wave;
 using NAudio.CoreAudioApi;
-using System.IO;
 
 namespace ReceiveAudio
 {
@@ -20,25 +20,23 @@ namespace ReceiveAudio
         {
             //音源のフォーマットを設定
             var bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(8000, 16, 1));
+
+            //バッファサイズを設定
             bufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 0, 0, 150);
-            bufferedWaveProvider.DiscardOnBufferOverflow = true;
+            bufferedWaveProvider.DiscardOnBufferOverflow = true;  //バッファオーバーフロー時にDiscardするように設定
 
             Console.WriteLine("buffersize= " + bufferedWaveProvider.BufferLength);
-
-            //ボリューム調整をするために上のBufferedWaveProviderをデコレータっぽく包む
-            var wavProvider = new VolumeWaveProvider16(bufferedWaveProvider);
-            wavProvider.Volume = 1.0f;
 
             //再生デバイスと出力先を設定
             var mmDevice = new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
             //外部からの音声入力を受け付け開始
-            Task t = StartReceiveAudioPacket(bufferedWaveProvider);
+            Task t = StartReceiveAudioPacketAsync(bufferedWaveProvider);
 
             using (IWavePlayer wavPlayer = new WasapiOut(mmDevice, AudioClientShareMode.Shared, false, 20))
             {
                 //出力に入力を接続して再生開始
-                wavPlayer.Init(wavProvider);
+                wavPlayer.Init(bufferedWaveProvider);
                 wavPlayer.Play();
 
                 Console.WriteLine("Press ENTER to exit...");
@@ -48,17 +46,17 @@ namespace ReceiveAudio
             }
         }
 
-        static async Task StartReceiveAudioPacket(BufferedWaveProvider provider)
+        static async Task StartReceiveAudioPacketAsync(BufferedWaveProvider provider)
         {
             //バインドするローカルポート番号
             int localPort = 50002;
 
             //UdpClientを作成し、ローカルエンドポイントにバインドする
-            System.Net.IPEndPoint localEP = new System.Net.IPEndPoint(System.Net.IPAddress.Any, localPort);
+            var localEP = new IPEndPoint(IPAddress.Any, localPort);
 
-            using (System.Net.Sockets.UdpClient udp = new System.Net.Sockets.UdpClient(localEP))
+            using (var udp = new System.Net.Sockets.UdpClient(localEP))
             {
-                System.Net.IPEndPoint remoteEP = null;
+                IPEndPoint remoteEP = null;
 
                 for (;;)
                 {
@@ -73,7 +71,7 @@ namespace ReceiveAudio
                         //バッファに追加
                         provider.AddSamples(rcvBytes, 0, rcvBytes.Length);
                     }
-                    
+
                     await Task.Delay(10);
                 }
 
