@@ -49,31 +49,41 @@ namespace SendAudio
             {
                 waveIn.BufferMilliseconds = 20;
 
+                var codec = new NAudio.Codecs.G722Codec();
+                var codecState = new NAudio.Codecs.G722CodecState(64000, NAudio.Codecs.G722Flags.None);
+
                 long count = 0;
 
                 //音声データ利用可能時の処理
                 waveIn.DataAvailable += async (_, e) =>
                 {
                     //-- 送信処理 --
+                    byte[] bufferedBytes = new byte[e.BytesRecorded];
+                    Array.Copy(e.Buffer, bufferedBytes, e.BytesRecorded);
+
+                    short[] bufferedData = Convert16BitToShort(bufferedBytes);
+                    byte[] encodedBytes = new byte[e.BytesRecorded];
+                    int encodedLength = codec.Encode(codecState, encodedBytes,bufferedData , bufferedData.Length);
+
                     byte[] bufferToSend = new byte[bufsize];
 
-                    for (int i = 0; i < e.BytesRecorded; i += bufsize)
+                    for (int i = 0; i < encodedLength; i += bufsize)
                     {
-                        if (e.BytesRecorded > i + bufsize)
+                        if (encodedLength > i + bufsize)
                         {
                             //バッファ内のデータがペイロードサイズ以上
-                            Array.Copy(e.Buffer, i, bufferToSend, 0, bufsize);
+                            Array.Copy(encodedBytes, i, bufferToSend, 0, bufsize);
                             await udp.SendAsync(bufferToSend, bufferToSend.Length, remoteEndPoint);
                         }
                         else
                         {
                             //バッファ内のサイズがペイロードサイズ以下
-                            Array.Copy(e.Buffer, i, bufferToSend, 0, e.BytesRecorded - i);
-                            await udp.SendAsync(bufferToSend, e.BytesRecorded - i, remoteEndPoint);
+                            Array.Copy(encodedBytes, i, bufferToSend, 0, encodedLength - i);
+                            await udp.SendAsync(bufferToSend, encodedLength - i, remoteEndPoint);
                         }
                     }
 
-                    count += e.BytesRecorded;
+                    count += encodedLength;
                     Console.WriteLine(count);
 
                     await Task.Delay(10);
@@ -98,6 +108,30 @@ namespace SendAudio
             Console.WriteLine("Program ended successfully.");
         }
 
+        static public float[] Convert16BitToFloat(byte[] input)
+        {
+            int inputSamples = input.Length / 2; // 16 bit input, so 2 bytes per sample
+            float[] output = new float[inputSamples];
+            int outputIndex = 0;
+            for (int n = 0; n < inputSamples; n++)
+            {
+                short sample = BitConverter.ToInt16(input, n * 2);
+                output[outputIndex++] = sample / 32768f;
+            }
+            return output;
+        }
 
+        static public short[] Convert16BitToShort(byte[] input)
+        {
+            int inputSamples = input.Length / 2; // 16 bit input, so 2 bytes per sample
+            short[] output = new short[inputSamples];
+            int outputIndex = 0;
+            for (int n = 0; n < inputSamples; n++)
+            {
+                short sample = BitConverter.ToInt16(input, n * 2);
+                output[outputIndex++] = sample;
+            }
+            return output;
+        }
     }
 }
