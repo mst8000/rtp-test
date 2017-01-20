@@ -20,7 +20,7 @@ namespace SendAudio
         const int remotePort = 50002;
 
         //最大UDPペイロードサイズ
-        const int bufsize = 330;
+        const int bufsize = 350;
 
         static void Main(string[] args)
         {
@@ -91,7 +91,7 @@ namespace SendAudio
                 };
 
                 //入力フォーマット設定
-                waveIn.WaveFormat = new WaveFormat(8000, 16, 1);
+                waveIn.WaveFormat = new WaveFormat(16000, 16, 1);
 
                 //音声の取得開始
                 waveIn.StartRecording();
@@ -108,22 +108,10 @@ namespace SendAudio
             Console.WriteLine("Program ended successfully.");
         }
 
-        static public float[] Convert16BitToFloat(byte[] input)
-        {
-            int inputSamples = input.Length / 2; // 16 bit input, so 2 bytes per sample
-            float[] output = new float[inputSamples];
-            int outputIndex = 0;
-            for (int n = 0; n < inputSamples; n++)
-            {
-                short sample = BitConverter.ToInt16(input, n * 2);
-                output[outputIndex++] = sample / 32768f;
-            }
-            return output;
-        }
-
+        //byte型配列からShort型配列に変換するメソッド
         static public short[] Convert16BitToShort(byte[] input)
         {
-            int inputSamples = input.Length / 2; // 16 bit input, so 2 bytes per sample
+            int inputSamples = input.Length / 2;
             short[] output = new short[inputSamples];
             int outputIndex = 0;
             for (int n = 0; n < inputSamples; n++)

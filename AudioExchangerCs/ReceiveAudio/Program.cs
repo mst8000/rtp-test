@@ -19,7 +19,7 @@ namespace ReceiveAudio
         static void Main(string[] args)
         {
             //音源のフォーマットを設定
-            var bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(8000, 16, 1));
+            var bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(16000, 16, 1));
 
             //バッファサイズを設定
             bufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 0, 0, 150);
@@ -68,46 +68,30 @@ namespace ReceiveAudio
                     {
                         byte[] rcvBytes = udp.Receive(ref remoteEP);
 
-                        short[] bufferedData = new short[330];
+                        short[] bufferedData = new short[350];
 
                         int bufferdLength = codec.Decode(codecState, bufferedData, rcvBytes, rcvBytes.Length);
 
                         byte[] bufferdBytes = ConvertShortTo16Bit(bufferedData, bufferdLength);
 
-                        Console.WriteLine("buffered= " + provider.BufferedBytes);
-                        Console.WriteLine("received= " + bufferdBytes.Length);
-
+                        
                         //バッファに追加
                         provider.AddSamples(bufferdBytes, 0, bufferdBytes.Length);
+
+                        Console.WriteLine("buffered= " + provider.BufferedBytes);
                     }
 
                     await Task.Delay(10);
                 }
-
-
             }
-
         }
 
-        static public short[] Convert16BitToShort(byte[] input)
-        {
-            int inputSamples = input.Length / 2; // 16 bit input, so 2 bytes per sample
-            short[] output = new short[inputSamples];
-            int outputIndex = 0;
-            for (int n = 0; n < inputSamples; n++)
-            {
-                short sample = BitConverter.ToInt16(input, n * 2);
-                output[outputIndex++] = sample;
-            }
-            return output;
-        }
-
+        //Short型配列からbyte型配列に変換するメソッド
         static public byte[] ConvertShortTo16Bit(short[] input, int inputLength)
         {
-            int inputSamples = inputLength * 2;
-            byte[] output = new byte[inputSamples];
+            int outputLength = inputLength * 2;
+            byte[] output = new byte[outputLength];
 
-            //int outputIndex = 0;
             for (int n = 0; n < inputLength; n++)
             {
                 byte[] sample = BitConverter.GetBytes(input[n]);
