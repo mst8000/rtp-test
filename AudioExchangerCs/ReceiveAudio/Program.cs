@@ -16,26 +16,30 @@ namespace ReceiveAudio
         // http://www.baku-dreameater.net/archives/10441
         // http://so-zou.jp/software/tech/programming/c-sharp/media/audio/naudio/
 
+        //バインドするローカルポート番号
+        const int localPort = 50002;
+
         static void Main(string[] args)
         {
-            //音源のフォーマットを設定
+            //音源のフォーマットを設定(16kHz, 16bit, 1ch)
             var bufferedWaveProvider = new BufferedWaveProvider(new WaveFormat(16000, 16, 1));
 
             //バッファサイズを設定
-            bufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 0, 0, 150);
-            bufferedWaveProvider.DiscardOnBufferOverflow = true;  //バッファオーバーフロー時にDiscardするように設定
+            bufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 0, 0, 150);    //150ms分確保
+            bufferedWaveProvider.DiscardOnBufferOverflow = true;                    //バッファオーバーフロー時にDiscardするように設定
 
+            //バッファサイズ表示
             Console.WriteLine("buffersize= " + bufferedWaveProvider.BufferLength);
 
             //再生デバイスと出力先を設定
             var mmDevice = new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
-            //外部からの音声入力を受け付け開始
+            //UDPパケットを受付開始
             Task t = StartReceiveAudioPacketAsync(bufferedWaveProvider);
 
             using (IWavePlayer wavPlayer = new WasapiOut(mmDevice, AudioClientShareMode.Shared, false, 20))
             {
-                //出力に入力を接続して再生開始
+                //出力に入力バッファを接続して再生開始
                 wavPlayer.Init(bufferedWaveProvider);
                 wavPlayer.Play();
 
@@ -47,13 +51,11 @@ namespace ReceiveAudio
         }
 
         static async Task StartReceiveAudioPacketAsync(BufferedWaveProvider provider)
-        {
-            //バインドするローカルポート番号
-            int localPort = 50002;
-
+        {            
             //UdpClientを作成し、ローカルエンドポイントにバインドする
             var localEP = new IPEndPoint(IPAddress.Any, localPort);
 
+            //G.722コーデックを用意
             var codec = new NAudio.Codecs.G722Codec();
             var codecState = new NAudio.Codecs.G722CodecState(64000, NAudio.Codecs.G722Flags.None);
 

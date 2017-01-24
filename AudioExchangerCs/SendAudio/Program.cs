@@ -16,7 +16,7 @@ namespace SendAudio
         // http://www.baku-dreameater.net/archives/10441
         // http://wildpie.hatenablog.com/entry/2014/09/24/000900
 
-        //データを送信するリモートホストとポート番号
+        //リモートポート番号
         const int remotePort = 50002;
 
         //最大UDPペイロードサイズ
@@ -40,21 +40,23 @@ namespace SendAudio
 
             //IPエンドポイントを生成
             var remoteEndPoint = new IPEndPoint(remoteAddress, remotePort);
-
-
+            
             //UdpClientオブジェクトを生成
-            System.Net.Sockets.UdpClient udp = new System.Net.Sockets.UdpClient();
+            var udp = new System.Net.Sockets.UdpClient();
 
             using (var waveIn = new WaveInEvent())
             {
+                //総送信バイト数を保持する変数
+                long count = 0;
+
+                //入力バッファのサイズを設定(20ms)
                 waveIn.BufferMilliseconds = 20;
 
+                //G.722コーデックを用意
                 var codec = new NAudio.Codecs.G722Codec();
                 var codecState = new NAudio.Codecs.G722CodecState(64000, NAudio.Codecs.G722Flags.None);
 
-                long count = 0;
-
-                //音声データ利用可能時の処理
+                //音声データ利用可能時の処理(非同期)
                 waveIn.DataAvailable += async (_, e) =>
                 {
                     //-- 送信処理 --
@@ -87,10 +89,9 @@ namespace SendAudio
                     Console.WriteLine(count);
 
                     await Task.Delay(10);
-
                 };
 
-                //入力フォーマット設定
+                //入力フォーマット設定(16kHz, 16bit, 1ch)
                 waveIn.WaveFormat = new WaveFormat(16000, 16, 1);
 
                 //音声の取得開始
@@ -111,7 +112,7 @@ namespace SendAudio
         //byte型配列からShort型配列に変換するメソッド
         static public short[] Convert16BitToShort(byte[] input)
         {
-            int inputSamples = input.Length / 2;
+            int inputSamples = (input.Length + 1) / 2;
             short[] output = new short[inputSamples];
             int outputIndex = 0;
             for (int n = 0; n < inputSamples; n++)
