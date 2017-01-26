@@ -1,56 +1,45 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using NAudio.Wave;
+using System;
 using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 
-using NAudio.Wave;
-using NAudio.CoreAudioApi;
-
-namespace SendAudio
+namespace AudioExchangerCs
 {
-    class Program
+    public class SendAudio
     {
-        // http://www.baku-dreameater.net/archives/10111
-        // http://www.baku-dreameater.net/archives/10441
-        // http://wildpie.hatenablog.com/entry/2014/09/24/000900
+        /// <summary>
+        /// ローカルポート番号
+        /// </summary>
+        public int LocalPort { get; set; } = 50002;
 
-        //ポート番号
-        const int localPort = 50002;
-        const int remotePort = 50003;
+        /// <summary>
+        /// リモートポート番号
+        /// </summary>
+        public int RemotePort { get; set; } = 50003;
 
-        //最大UDPペイロードサイズ
-        const int bufsize = 350;
+        /// <summary>
+        /// 最大UDPペイロードサイズ
+        /// </summary>
+        public int MaxPacketPayloadSize { get; set; } = 350;
 
-        static void Main(string[] args)
+        /// <summary>
+        /// UDP音声パケットの送信を開始します
+        /// </summary>
+        /// <param name="remoteAddress">リモートIPアドレス</param>
+        /// <param name="cancellTokenSource">受信を停止するためのCancellationTokenSource</param>
+        /// <returns></returns>
+        public async Task StartSendAsync(IPAddress remoteAddress, CancellationTokenSource cancellTokenSource)
         {
-            //接続先のIPアドレスを入力
-            Console.Write("接続先IPアドレス：");
-            string remoteHost = Console.ReadLine();
-
-            //String型のIPアドレスをIPAddress型にParse
-            IPAddress remoteAddress;
-            if (IPAddress.TryParse(remoteHost, out remoteAddress) == false)
-            {
-                Console.WriteLine("正しくないIPアドレスが入力されました");
-
-                // 終了
-                Environment.Exit(-1);
-            }
-
             //IPエンドポイントを生成
-            var remoteEndPoint = new IPEndPoint(remoteAddress, remotePort);
-            var localEndPoint = new IPEndPoint(IPAddress.Any, localPort);
-            
+            var remoteEndPoint = new IPEndPoint(remoteAddress, RemotePort);
+            var localEndPoint = new IPEndPoint(IPAddress.Any, LocalPort);
+
             //UdpClientオブジェクトを生成
             var udp = new System.Net.Sockets.UdpClient(localEndPoint);
 
             using (var waveIn = new WaveInEvent())
             {
-                //総送信バイト数を保持する変数
-                long count = 0;
-
                 //入力バッファのサイズを設定(20ms)
                 waveIn.BufferMilliseconds = 20;
 
@@ -67,16 +56,16 @@ namespace SendAudio
 
                     short[] bufferedData = Convert16BitToShort(bufferedBytes);
                     byte[] encodedBytes = new byte[e.BytesRecorded];
-                    int encodedLength = codec.Encode(codecState, encodedBytes,bufferedData , bufferedData.Length);
+                    int encodedLength = codec.Encode(codecState, encodedBytes, bufferedData, bufferedData.Length);
 
-                    byte[] bufferToSend = new byte[bufsize];
+                    byte[] bufferToSend = new byte[MaxPacketPayloadSize];
 
-                    for (int i = 0; i < encodedLength; i += bufsize)
+                    for (int i = 0; i < encodedLength; i += MaxPacketPayloadSize)
                     {
-                        if (encodedLength > i + bufsize)
+                        if (encodedLength > i + MaxPacketPayloadSize)
                         {
                             //バッファ内のデータがペイロードサイズ以上
-                            Array.Copy(encodedBytes, i, bufferToSend, 0, bufsize);
+                            Array.Copy(encodedBytes, i, bufferToSend, 0, MaxPacketPayloadSize);
                             await udp.SendAsync(bufferToSend, bufferToSend.Length, remoteEndPoint);
                         }
                         else
@@ -86,10 +75,7 @@ namespace SendAudio
                             await udp.SendAsync(bufferToSend, encodedLength - i, remoteEndPoint);
                         }
                     }
-
-                    count += encodedLength;
-                    Console.WriteLine(count);
-
+                    
                     await Task.Delay(10);
                 };
 
@@ -99,20 +85,21 @@ namespace SendAudio
                 //音声の取得開始
                 waveIn.StartRecording();
 
-                Console.WriteLine("Press ENTER to quit...");
-                Console.ReadLine();
-
+                while (true)
+                {
+                    if (cancellTokenSource.IsCancellationRequested) break;
+                    await Task.Delay(100);
+                }
+               
                 //音声の取得終了
                 waveIn.StopRecording();
             }
 
             udp.Close();
-
-            Console.WriteLine("Program ended successfully.");
         }
-
+        
         //byte型配列からShort型配列に変換するメソッド
-        static public short[] Convert16BitToShort(byte[] input)
+        static private short[] Convert16BitToShort(byte[] input)
         {
             int inputSamples = (input.Length + 1) / 2;
             short[] output = new short[inputSamples];
