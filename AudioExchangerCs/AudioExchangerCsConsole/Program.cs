@@ -42,7 +42,6 @@ namespace AudioExchangerCsConsole
                 task_r.Start();
                 task_s.Start();
 
-                Console.SetCursorPosition(0, Console.CursorTop - 1);
                 Console.WriteLine($"[通話開始] ({DateTime.Now.ToString("HH:mm:ss")}) -->{remoteAddress.ToString()}({sendAudio.RemotePort})");
                 Console.Write("Enterキーを押すと通話を終了します...");
                 Console.ReadKey();
@@ -65,8 +64,7 @@ namespace AudioExchangerCsConsole
                 }
                 finally
                 {
-                    Console.SetCursorPosition(0, Console.CursorTop - 1);
-                    Console.WriteLine($"[通話終了] ({DateTime.Now.ToString("HH:mm:ss")})               ");
+                    Console.WriteLine($"[通話終了] ({DateTime.Now.ToString("HH:mm:ss")})");
                 }
             }
         }
