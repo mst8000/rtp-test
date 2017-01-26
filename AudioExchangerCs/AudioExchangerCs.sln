@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26020.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioExchangerCs", "AudioExchangerCs\AudioExchangerCs.csproj", "{5EE22478-CAF7-4E22-9C34-C98496AA186F}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ExampleProjects", "ExampleProjects", "{8130EAF3-02E2-480F-8646-0EBEB5F05790}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SendAudio", "SendAudio\SendAudio.csproj", "{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}"
@@ -13,16 +11,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReceiveAudio", "ReceiveAudi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioExchangerCsConsole", "AudioExchangerCsConsole\AudioExchangerCsConsole.csproj", "{DA0DBF4D-C2BA-4853-850E-9566A1B2CA63}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{EFBF3ADA-D670-4416-B614-8C91CE644C01}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioExchangerCs.SendAudio", "Libraries\AudioExchangerCs.SendAudio\AudioExchangerCs.SendAudio.csproj", "{65F57334-8217-47DA-BE55-760796636E99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioExchangerCs.ReceiveAudio", "Libraries\AudioExchangerCs.ReceiveAudio\AudioExchangerCs.ReceiveAudio.csproj", "{2C2A802A-863D-4B49-95FF-92F8D0CF9C00}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5EE22478-CAF7-4E22-9C34-C98496AA186F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -35,6 +35,14 @@ Global
 		{DA0DBF4D-C2BA-4853-850E-9566A1B2CA63}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA0DBF4D-C2BA-4853-850E-9566A1B2CA63}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA0DBF4D-C2BA-4853-850E-9566A1B2CA63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65F57334-8217-47DA-BE55-760796636E99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65F57334-8217-47DA-BE55-760796636E99}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65F57334-8217-47DA-BE55-760796636E99}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65F57334-8217-47DA-BE55-760796636E99}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C2A802A-863D-4B49-95FF-92F8D0CF9C00}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C2A802A-863D-4B49-95FF-92F8D0CF9C00}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C2A802A-863D-4B49-95FF-92F8D0CF9C00}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C2A802A-863D-4B49-95FF-92F8D0CF9C00}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -42,6 +50,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{A0885333-B6B0-4FA6-A4DD-3AC1011232E9} = {8130EAF3-02E2-480F-8646-0EBEB5F05790}
 		{CA541BE5-B0DA-4CD5-87BC-592C562DF80F} = {8130EAF3-02E2-480F-8646-0EBEB5F05790}
-		{DA0DBF4D-C2BA-4853-850E-9566A1B2CA63} = {8130EAF3-02E2-480F-8646-0EBEB5F05790}
+		{65F57334-8217-47DA-BE55-760796636E99} = {EFBF3ADA-D670-4416-B614-8C91CE644C01}
+		{2C2A802A-863D-4B49-95FF-92F8D0CF9C00} = {EFBF3ADA-D670-4416-B614-8C91CE644C01}
 	EndGlobalSection
 EndGlobal
