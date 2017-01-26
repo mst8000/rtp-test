@@ -16,8 +16,9 @@ namespace SendAudio
         // http://www.baku-dreameater.net/archives/10441
         // http://wildpie.hatenablog.com/entry/2014/09/24/000900
 
-        //リモートポート番号
-        const int remotePort = 50002;
+        //ポート番号
+        const int localPort = 50002;
+        const int remotePort = 50003;
 
         //最大UDPペイロードサイズ
         const int bufsize = 350;
@@ -40,9 +41,10 @@ namespace SendAudio
 
             //IPエンドポイントを生成
             var remoteEndPoint = new IPEndPoint(remoteAddress, remotePort);
+            var localEndPoint = new IPEndPoint(IPAddress.Any, localPort);
             
             //UdpClientオブジェクトを生成
-            var udp = new System.Net.Sockets.UdpClient();
+            var udp = new System.Net.Sockets.UdpClient(localEndPoint);
 
             using (var waveIn = new WaveInEvent())
             {

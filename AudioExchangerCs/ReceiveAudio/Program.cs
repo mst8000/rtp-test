@@ -17,7 +17,7 @@ namespace ReceiveAudio
         // http://so-zou.jp/software/tech/programming/c-sharp/media/audio/naudio/
 
         //バインドするローカルポート番号
-        const int localPort = 50002;
+        const int localPort = 50003;
 
         static void Main(string[] args)
         {
@@ -29,7 +29,7 @@ namespace ReceiveAudio
             bufferedWaveProvider.DiscardOnBufferOverflow = true;                    //バッファオーバーフロー時にDiscardするように設定
 
             //バッファサイズ表示
-            Console.WriteLine("buffersize= " + bufferedWaveProvider.BufferLength);
+            Console.WriteLine("BufferSize= " + bufferedWaveProvider.BufferLength);
 
             //再生デバイスと出力先を設定
             var mmDevice = new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
@@ -80,7 +80,7 @@ namespace ReceiveAudio
                         //バッファに追加
                         provider.AddSamples(bufferdBytes, 0, bufferdBytes.Length);
 
-                        Console.WriteLine("buffered= " + provider.BufferedBytes);
+                        Console.WriteLine("Buffered= " + provider.BufferedBytes);
                     }
 
                     await Task.Delay(10);
