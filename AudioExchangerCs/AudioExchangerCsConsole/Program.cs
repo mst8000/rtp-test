@@ -32,7 +32,7 @@ namespace AudioExchangerCsConsole
                 }
 
                 Console.Write("Enterキーを押すと通話を開始します...");
-                Console.ReadKey();
+                Console.ReadLine();
 
                 //タスクを生成
                 var task_r = new Task(async () => await receiveAudio.StartReceiveAsync(source));
@@ -44,7 +44,7 @@ namespace AudioExchangerCsConsole
 
                 Console.WriteLine($"[通話開始] ({DateTime.Now.ToString("HH:mm:ss")}) -->{remoteAddress.ToString()}({sendAudio.RemotePort})");
                 Console.Write("Enterキーを押すと通話を終了します...");
-                Console.ReadKey();
+                Console.ReadLine();
 
                 //タスクのキャンセル要求を発行
                 source.Cancel();
@@ -64,7 +64,7 @@ namespace AudioExchangerCsConsole
                 }
                 finally
                 {
-                    Console.WriteLine($"[通話終了] ({DateTime.Now.ToString("HH:mm:ss")})");
+                    Console.WriteLine($"[通話終了] ({DateTime.Now.ToString("HH:mm:ss")})\r\n");
                 }
             }
         }
