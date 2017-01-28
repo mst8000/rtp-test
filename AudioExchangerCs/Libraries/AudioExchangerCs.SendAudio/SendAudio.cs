@@ -75,7 +75,6 @@ namespace AudioExchangerCs
                             await udp.SendAsync(bufferToSend, encodedLength - i, remoteEndPoint);
                         }
                     }
-                    
                     await Task.Delay(10);
                 };
 
@@ -94,7 +93,6 @@ namespace AudioExchangerCs
                 //音声の取得終了
                 waveIn.StopRecording();
             }
-
             udp.Close();
         }
         

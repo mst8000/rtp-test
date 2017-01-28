@@ -28,7 +28,7 @@ namespace AudioExchangerCs
             bufferedWaveProvider.BufferDuration = new TimeSpan(0, 0, 0, 0, 150);    //150ms分確保
             bufferedWaveProvider.DiscardOnBufferOverflow = true;                    //バッファオーバーフロー時にDiscardするように設定
 
-            //再生デバイスと出力先を設定
+            //再生デバイスと出力先(WASAPI)を設定
             var mmDevice = new MMDeviceEnumerator().GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
 
             //UDPパケットを受付開始
@@ -40,6 +40,7 @@ namespace AudioExchangerCs
                 wavPlayer.Init(bufferedWaveProvider);
                 wavPlayer.Play();
 
+                //タスクがキャンセルまで非同期で待機
                 while (true)
                 {
                     if (cancellTokenSource.IsCancellationRequested) break;
@@ -69,18 +70,13 @@ namespace AudioExchangerCs
                     while (udp.Available > 0)
                     {
                         byte[] rcvBytes = udp.Receive(ref remoteEP);
-
                         short[] bufferedData = new short[350];
-
                         int bufferdLength = codec.Decode(codecState, bufferedData, rcvBytes, rcvBytes.Length);
-
                         byte[] bufferdBytes = ConvertShortTo16Bit(bufferedData, bufferdLength);
-
 
                         //バッファに追加
                         provider.AddSamples(bufferdBytes, 0, bufferdBytes.Length);
                     }
-
                     await Task.Delay(10);
                 }
             }
